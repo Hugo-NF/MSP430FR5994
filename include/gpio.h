@@ -1,8 +1,8 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
-#include <stdint.h>
 #include <msp430.h>
+#include <stdint.h>
 
 #define SET_REG(reg, bit)      (reg |= bit)
 #define CLEAR_REG(reg, bit)    (reg &= ~(bit))
