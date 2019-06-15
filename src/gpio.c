@@ -1,6 +1,6 @@
 #include "../include/gpio.h"
 
-#ifndef PORT_MAPS
+#ifndef GPIO_PORT_MAPS
 const uint16_t port_to_dir[]={
     (uint16_t) &P1DIR,
     (uint16_t) &P2DIR,
@@ -101,7 +101,7 @@ const uint16_t port_to_sel1[]={
 };
 
 
-#endif //PORT_MAPS
+#endif //GPIO_PORT_MAPS
 
 inline void setPin(unsigned char pin, unsigned char mode){
     uint8_t bit = Mask(pin);
@@ -199,8 +199,8 @@ inline void selectPin(unsigned char pin, uint8_t function){
     uint8_t bit = Mask(pin);
     uint8_t port = Port(pin);
 
-    volatile uint8_t *sel0 = portToIes(port);
-    volatile uint8_t *sel1 = portToIe(port);
+    volatile uint8_t *sel0 = portToSel0(port);
+    volatile uint8_t *sel1 = portToSel1(port);
 
     switch(function){
     case 0:
