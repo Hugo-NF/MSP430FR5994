@@ -4,16 +4,41 @@
 #include <msp430.h>
 #include <stdint.h>
 
+/**
+ * Registers manipulation macros:
+ * SET_REG(reg, bit)
+ *      Turns a bit into '1'.
+ *      Bitwise OR between 'reg' and 'bit'
+ * CLEAR_REG(reg, bit)
+ *      Turns a bit into '0'
+ *      Bitwise AND between 'reg' and NOT 'bit'
+ * TOOGLE_REG(reg, bit)
+ *      Inverts bit value
+ *      Bitwise XOR between 'reg' and 'bit'
+ * READ_REG(reg, bit)
+ *      Read the value of a bit into reg
+ *      Bitwise AND between 'reg' and 'bit'
+ * */
 #define SET_REG(reg, bit)      (reg |= bit)
 #define CLEAR_REG(reg, bit)    (reg &= ~(bit))
 #define TOOGLE_REG(reg, bit)   (reg ^= bit)
 #define READ_REG(reg, bit)     (reg & bit)
 
+/**
+ * Macro to Enable GPIO ports
+ * Disable the GPIO power-on default high-impedance mode to activate previously configured port settings
+ * */
 #define disableHighZ           (PM5CTL0 &= ~LOCKLPM5)
 
+/**
+ * Macro name definitions to logical levels, aiming to provide better semantic understanding of the code
+ * */
 #define HIGH    1
 #define LOW     0
 
+/**
+ * Macro name definitions to GPIO modes, aiming to provide better semantic understanding of the code
+ * */
 #define OUTPUT          0
 #define INPUT           1
 #define INPUT_PULL_UP   2
@@ -21,9 +46,16 @@
 #define PULL_UP         4
 #define PULL_DOWN       5
 
-#define LOW_TO_HIGH 0
-#define HIGH_TO_LOW 1
+/**
+ * Macro name definitions to transition borders, aiming to provide better semantic understanding of the code
+ * */
+#define RISING_EDGE 0
+#define FALLING_EDGE 1
 
+/**
+ * Macro name definitions to port numbers
+ * Use these macros to refer to a port when calling a function
+ * */
 #define P1  0
 #define P2  1
 #define P3  2
@@ -33,6 +65,10 @@
 #define P7  6
 #define P8  7
 
+/**
+ * Macro name definitions to pin numbers
+ * Use these macros to refer to a pin when calling a function
+ * */
 #define P1_0    0
 #define P1_1    1
 #define P1_2    2
@@ -93,6 +129,10 @@
 #define P8_1    57
 #define P8_2    58
 
+/**
+ * Macro definitions to retrieve addresses from GPIO port map
+ * DO NOT use these directly, internal use only
+ * */
 #define Port(Pin)    (Pin >> 3)
 #define Mask(Pin)    (1 << (Pin & 7))
 #define portToDir(P) ((volatile uint8_t *) (port_to_dir[P]))
@@ -105,12 +145,68 @@
 #define portToSel0(P) ((volatile uint8_t *) (port_to_sel0[P]))
 #define portToSel1(P) ((volatile uint8_t *) (port_to_sel1[P]))
 
+/**
+ *  \fn inline void setPin(unsigned char pin, unsigned char mode);
+ *  \brief Configures a pin to a GPIO mode
+ *  \param pin: PIN number
+ *  \param mode: Desired GPIO mode (OUTPUT, INPUT, INPUT_PULL_UP, INPUT_PULL_DOWN, PULL_UP, PULL_DOWN)
+ *  \warning: Use macro definition to get the correct numbers
+ * */
 inline void setPin(unsigned char pin, unsigned char mode);
+
+/**
+ *  \fn inline void writePin(unsigned char pin, unsigned char value);
+ *  \brief Write a logical level to a pin
+ *  \param pin: PIN number
+ *  \param mode: Logical level to be written (HIGH, LOW)
+ *  \warning: Pin must be configured previously.
+ *  \warning: Use macro definition to get the correct numbers.
+ * */
 inline void writePin(unsigned char pin, unsigned char value);
+
+/**
+ *  \fn inline void tooglePin(unsigned char pin);
+ *  \brief Inverts the logical level of a pin
+ *  \param pin: PIN number
+ *  \warning: Pin must be configured previously.
+ *  \warning: Use macro definition to get the correct numbers.
+ * */
 inline void tooglePin(unsigned char pin);
-inline unsigned char readPin(unsigned char pin);
+
+/**
+ *  \fn inline uint8_t readPin(unsigned char pin);
+ *  \brief Reads the logical level of a pin
+ *  \param pin: PIN number
+ *  \return Logical level of the pin, can be 0 (LOW) or 1 (HIGH)
+ *  \warning: Pin must be configured previously.
+ *  \warning: Use macro definition to get the correct numbers.
+ * */
+inline uint8_t readPin(unsigned char pin);
+
+/**
+ *  \fn inline void setInterrupt(unsigned char pin, unsigned char mode);
+ *  \brief Enables an interruption of a pin
+ *  \param pin: PIN number
+ *  \param mode: Transition border desired for the interruption, can be (RISING_EDGE) or (FALLING_EDGE)
+ *  \warning: Use macro definition to get the correct numbers.
+ * */
 inline void setInterrupt(unsigned char pin, unsigned char mode);
+
+/**
+ *  \fn inline void disableInterrupt(unsigned char pin);
+ *  \brief Disable an previously configured interruption of a pin
+ *  \param pin: PIN number
+ *  \warning: Use macro definition to get the correct numbers.
+ * */
 inline void disableInterrupt(unsigned char pin);
+
+/**
+ *  \fn inline void selectPin(unsigned char pin, uint8_t function);
+ *  \brief Multiplexes a pin to one of it's dedicated functions
+ *  \param pin: PIN number
+ *  \param function: Number of the dedicated function selection (0: No selection, 1: Primary, 2: Secondary, 3: Tertiary)
+ *  \warning: Use macro definition to get the correct numbers.
+ * */
 inline void selectPin(unsigned char pin, uint8_t function);
 
 

@@ -64,26 +64,33 @@ void I2C_single_master(unsigned int eUSCI_Bx, int SDA_pin, int SCL_pin, int pres
     *ctl    &= ~(UCSWRST);                      // Clear Software reset
 }
 
-void I2C_transmit(uint8_t slave_address, unsigned int eUSCI_Bx) {
+int I2C_transmit(uint8_t slave_address, unsigned int eUSCI_Bx) {
     volatile uint16_t *ctl = ucbToCtl(eUSCI_Bx);
     volatile uint16_t *sa = ucbToI2Csa(eUSCI_Bx);
-    volatile uint16_t *stat = ucbToStat(eUSCI_Bx);
     volatile uint16_t *ifg = ucbToIfg(eUSCI_Bx);
     volatile uint16_t *tx = ucbToTxbuf(eUSCI_Bx);
 
+    *ctl |= UCTR;
+
     *sa = slave_address;                                // Setting slave address
 
-    while(READ_REG(*stat, UCBBUSY) !=  0);              // Verifying SDA availability
-
-    *ctl |= UCTR;
     *ctl |= UCTXSTT;                                    // Transmit I2C Start Condition
 
-    while(READ_REG(*ifg, UCTXIFG0) == 0);                // Wait for TXBUFF Interruption (SCL is hold)
+    while(READ_REG(*ifg, UCTXIFG0) == 0);               // Wait for TXBUFF Interruption (SCL is hold)
 
-    *tx = TX_data;                              // Copy byte to TXBUFF
+    *tx = TX_data;                                      // Copy byte to TXBUFF
 
-    while(READ_REG(*ifg, UCTXIFG0) != 0);               // Wait for Slave Answer (Can be ACK or NACK)
+    while(!READ_REG(*ifg, UCTXIFG) && !READ_REG(*ifg, UCNACKIFG));               // Wait for Slave Answer (Can be ACK or NACK)
+    if(READ_REG(*ifg, UCNACKIFG)){
+        *ctl |= UCTXSTP;
+        while(READ_REG(*ctl, UCTXSTP));
+        return -1;
+    }
 
-    *ctl |= UCTXSTP;                            // Transmit I2C Stop Condition
-    while(READ_REG(*ctl, UCTXSTP) != 0);               // Wait for Stop Condition
+    while(READ_REG(*ifg, UCTXIFG) == 0);
+    *ctl |= UCTXSTP;                                    // Transmit I2C Stop Condition
+    *ifg &= ~UCTXIFG;
+    while(READ_REG(*ctl, UCTXSTP) == 0);               // Wait for Stop Condition
+
+    return 0;
 }

@@ -1,8 +1,10 @@
 #include "../include/lcd.h"
+#include "../include/timers.h"
 
-void lcd_init(unsigned char address){
+
+void lcd_init(unsigned char address, unsigned int eUSCI_Bx, int SDA_pin, int SCL_pin, int prescale){
     lcd_address = address;
-    I2C_single_master(UCB2, P7_0, P7_1, 8);
+    I2C_single_master(eUSCI_Bx, SDA_pin, SCL_pin, prescale);
 
     delay_miliseconds(15);
     lcd_write_command(LCD_INIT_BYTE, 0);
@@ -19,8 +21,6 @@ void lcd_init(unsigned char address){
     lcd_write_command(LCD_CLEAR, 1);
     lcd_write_command(LCD_INCREMENT_NO_SHIFT, 1);
     lcd_write_command(LCD_DISPLAY_ON_CURSOR_OFF, 1);
-
-    writePin(P1_0, HIGH);
 }
 
 void lcd_write_command(unsigned char data, unsigned char cmdtype) {
@@ -58,9 +58,20 @@ void lcd_write_char(unsigned char data) {
     I2C_transmit(lcd_address, UCB2);
 }
 
-void lcd_write_string(char *s) {
-    while (*s != '\0')
-        lcd_write_char(*s++);
+void lcd_write_literal(char *string){
+    while (*string != '\0')
+            lcd_write_char(*string++);
+}
+
+void lcd_printf(uint8_t line, const char *format, ...) {
+    va_list args;
+    va_start (args, format);
+    vsnprintf(lcd_buffer[line-1], LEN_LINE, format, args);
+    if(line == 2)
+        lcd_set_position(2, 1);
+    lcd_write_literal(lcd_buffer[line-1]);
+    va_end(args);
+    lcd_set_position(1, 1);
 }
 
 void lcd_set_position(unsigned char row, unsigned char column) {

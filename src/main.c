@@ -12,11 +12,11 @@ void main(void) {
 	// previously configured port settings
     disableHighZ;
 
-    setPin(P1_0, OUTPUT);
-    setPin(P1_1, OUTPUT);
-    writePin(P1_1, LOW);
+    lcd_init(0x27, UCB2, P7_0, P7_1, 10);
+    uint8_t a = 12;
+    lcd_printf(1, "V1: %d", a);
+    lcd_printf(2, "LCD ADDR: 0x%x", lcd_address);
 
-    lcd_init(0x27);
 
     while(1);
 }

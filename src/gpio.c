@@ -161,7 +161,7 @@ inline void tooglePin(unsigned char pin){
     *out ^= bit;
 }
 
-inline unsigned char readPin(unsigned char pin){
+inline uint8_t readPin(unsigned char pin){
     uint8_t bit = Mask(pin);
     uint8_t port = Port(pin);
 
@@ -177,7 +177,7 @@ inline void setInterrupt(unsigned char pin, unsigned char mode){
     volatile uint8_t *ies = portToIes(port);
     volatile uint8_t *ie = portToIe(port);
 
-    if(mode == LOW_TO_HIGH){
+    if(mode == FALLING_EDGE){
         *ies |= bit;
     }else{
         *ies &= ~(bit);

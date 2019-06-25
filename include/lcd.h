@@ -3,6 +3,9 @@
 
 #include "i2c.h"
 #include "timers.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
 #define LCD_WAIT_DELAY 2
 #define LCD_BL 0x08
@@ -37,13 +40,17 @@
 #define LO_NIBBLE(byte) (((byte) << 4) & 0xF0)
 #define HI_NIBBLE(byte) ((byte) & 0xF0)
 
+#define NO_LINES                2
 #define LEN_LINE                16
 
 volatile uint8_t lcd_address;
+char lcd_buffer[NO_LINES][LEN_LINE];
 
-void lcd_init(unsigned char address);
+void lcd_init(unsigned char address, unsigned int eUSCI_Bx, int SDA_pin, int SCL_pin, int prescale);
 void lcd_write_command(unsigned char data, unsigned char cmdtype);
 void lcd_write_char(unsigned char data);
-void lcd_write_string(char *s);
+void lcd_write_literal(char *string);
+void lcd_printf(uint8_t line, const char *format, ...);
+void lcd_set_position(unsigned char row, unsigned char column);
 
 #endif

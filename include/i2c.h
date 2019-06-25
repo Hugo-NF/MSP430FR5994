@@ -20,6 +20,6 @@
 uint8_t TX_data;
 
 void I2C_single_master(unsigned int eUSCI_Bx, int SDA_pin, int SCL_pin, int prescale);
-void I2C_transmit(uint8_t slave_address, unsigned int eUSCI_Bx);
+int I2C_transmit(uint8_t slave_address, unsigned int eUSCI_Bx);
 
 #endif
