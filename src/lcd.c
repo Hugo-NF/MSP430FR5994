@@ -4,6 +4,8 @@
 
 void lcd_init(unsigned char address, unsigned int eUSCI_Bx, int SDA_pin, int SCL_pin, int prescale){
     lcd_address = address;
+    lcd_UCBx = eUSCI_Bx;
+
     I2C_single_master(eUSCI_Bx, SDA_pin, SCL_pin, prescale);
 
     delay_miliseconds(15);
@@ -26,16 +28,16 @@ void lcd_init(unsigned char address, unsigned int eUSCI_Bx, int SDA_pin, int SCL
 void lcd_write_command(unsigned char data, unsigned char cmdtype) {
 
     TX_data = (HI_NIBBLE(data) | LCD_BL) | LCD_EN;
-    I2C_transmit(lcd_address, UCB2);
+    I2C_transmit(lcd_address, lcd_UCBx);
 
     TX_data = (HI_NIBBLE(data) | LCD_BL) & ~LCD_EN;
-    I2C_transmit(lcd_address, UCB2);
+    I2C_transmit(lcd_address, lcd_UCBx);
 
     if (cmdtype) {
         TX_data = (LO_NIBBLE(data) | LCD_BL) | LCD_EN;
-        I2C_transmit(lcd_address, UCB2);
+        I2C_transmit(lcd_address, lcd_UCBx);
         TX_data = (LO_NIBBLE(data) | LCD_BL) | ~LCD_EN;
-        I2C_transmit(lcd_address, UCB2);
+        I2C_transmit(lcd_address, lcd_UCBx);
     }
     if(data == LCD_CLEAR || data == LCD_HOME)
         delay_miliseconds(2);
@@ -46,16 +48,16 @@ void lcd_write_command(unsigned char data, unsigned char cmdtype) {
 void lcd_write_char(unsigned char data) {
 
     TX_data = (HI_NIBBLE(data) | LCD_BL | LCD_RS) | LCD_EN;
-    I2C_transmit(lcd_address, UCB2);
+    I2C_transmit(lcd_address, lcd_UCBx);
 
     TX_data = (HI_NIBBLE(data) | LCD_BL | LCD_RS) & ~LCD_EN;
-    I2C_transmit(lcd_address, UCB2);
+    I2C_transmit(lcd_address, lcd_UCBx);
 
     TX_data = (LO_NIBBLE(data) | LCD_BL | LCD_RS) | LCD_EN;
-    I2C_transmit(lcd_address, UCB2);
+    I2C_transmit(lcd_address, lcd_UCBx);
 
     TX_data = (LO_NIBBLE(data) | LCD_BL | LCD_RS) & ~LCD_EN;
-    I2C_transmit(lcd_address, UCB2);
+    I2C_transmit(lcd_address, lcd_UCBx);
 }
 
 void lcd_write_literal(char *string){

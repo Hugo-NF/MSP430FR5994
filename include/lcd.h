@@ -44,6 +44,7 @@
 #define LEN_LINE                16
 
 volatile uint8_t lcd_address;
+unsigned int lcd_UCBx;
 char lcd_buffer[NO_LINES][LEN_LINE];
 
 void lcd_init(unsigned char address, unsigned int eUSCI_Bx, int SDA_pin, int SCL_pin, int prescale);
